@@ -4,6 +4,9 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-2">
+        <p id="user_count"></p>
+      </div>
+      <div class="col-sm-2">
         <div class="input-group">
           <span class="input-group-addon">@</span>
           <input id="username" type="text" class="form-control" placeholder="username">

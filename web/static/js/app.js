@@ -40,6 +40,10 @@ class App {
       var username = this.sanitize(msg.user || "anonymous")
       $messages.append(`<br/><i>[${username} entered]</i>`)
     })
+
+    chan.on("user_count", msg => {
+      $("#user_count").text(msg.count)
+    })
   }
 
   static sanitize(html){ return $("<div/>").text(html).html() }

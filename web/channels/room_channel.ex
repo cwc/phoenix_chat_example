@@ -25,6 +25,8 @@ defmodule Chat.RoomChannel do
   end
 
   def handle_info({:after_join, msg}, socket) do
+    broadcast! socket, "user_count", %{count: count()}
+
     broadcast! socket, "user:entered", %{user: msg["user"]}
     push socket, "join", %{status: "connected"}
     {:noreply, socket}
@@ -34,13 +36,20 @@ defmodule Chat.RoomChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, _socket) do
-    Logger.debug"> leave #{inspect reason}"
+  def terminate(reason, socket) do
+    broadcast! socket, "user_count", %{count: count() - 1}
+
+    Logger.debug "#{inspect socket.assigns[:user]}> leave #{inspect reason}" 
     :ok
   end
 
   def handle_in("new:msg", msg, socket) do
     broadcast! socket, "new:msg", %{user: msg["user"], body: msg["body"]}
     {:reply, {:ok, %{msg: msg["body"]}}, assign(socket, :user, msg["user"])}
+  end
+
+  def count do
+    acc = fn {channel, _}, map -> Map.update(map, channel, 1, &(&1 + 1)) end
+    :ets.foldl(acc, %{}, Chat.PubSub.Local0)["rooms:lobby"]
   end
 end
