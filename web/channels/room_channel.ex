@@ -32,7 +32,7 @@ defmodule Chat.RoomChannel do
     {:noreply, socket}
   end
   def handle_info(:ping, socket) do
-    push socket, "new:msg", %{user: "SYSTEM", body: "ping"}
+    push socket, "new:msg", %{user: Atom.to_string(Node.self), body: inspect(DateTime.utc_now |> DateTime.to_unix)}
     {:noreply, socket}
   end
 
@@ -47,6 +47,7 @@ defmodule Chat.RoomChannel do
 #    broadcast! socket, "new:msg", %{user: msg["user"], body: msg["body"]}
 
 	if msg["body"] == "count", do: push socket, "user_count", %{count: count()}
+	if msg["body"] == "broadcast", do: broadcast! socket, "new:msg", %{user: Atom.to_string(Node.self), body: count()}
     {:reply, {:ok, %{msg: msg["body"]}}, assign(socket, :user, msg["user"])}
   end
 
