@@ -15,7 +15,7 @@ defmodule Chat.RoomChannel do
   def join("rooms:lobby", message, socket) do
     Process.flag(:trap_exit, true)
     :timer.send_interval(5000, :ping)
-    send(self, {:after_join, message})
+#    send(self, {:after_join, message})
 
     {:ok, socket}
   end
@@ -37,14 +37,16 @@ defmodule Chat.RoomChannel do
   end
 
   def terminate(reason, socket) do
-    broadcast! socket, "user_count", %{count: count() - 1}
+    #broadcast! socket, "user_count", %{count: count() - 1}
 
     Logger.debug "#{inspect socket.assigns[:user]}> leave #{inspect reason}" 
     :ok
   end
 
   def handle_in("new:msg", msg, socket) do
-    broadcast! socket, "new:msg", %{user: msg["user"], body: msg["body"]}
+#    broadcast! socket, "new:msg", %{user: msg["user"], body: msg["body"]}
+
+	if msg["body"] == "count", do: push socket, "user_count", %{count: count()}
     {:reply, {:ok, %{msg: msg["body"]}}, assign(socket, :user, msg["user"])}
   end
 
